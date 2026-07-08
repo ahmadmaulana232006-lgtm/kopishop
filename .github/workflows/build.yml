@@ -1,50 +1,36 @@
-name: Build Debug APK
+name: Build APK
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - "release/**"
+    branches: ["main"]
 
 jobs:
-  build-apk:
-    name: Build Flutter APK Debug
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "stable"
+          channel: "stable"
 
-      - name: Install Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
-      - name: Enable Flutter Android license acceptance
-        run: |
-          flutter doctor --android-licenses << 'EOF'
-          y
-          y
-          y
-          y
-          y
-          EOF
-
-      - name: Install Flutter dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build debug APK
-        run: flutter build apk --debug --no-shrink
+      - name: Build APK Debug
+        run: flutter build apk --debug
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
         with:
           name: kopishop-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
